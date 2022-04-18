@@ -15,10 +15,7 @@ namespace bot
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
         private Timer _timer = null;
 
-
-        public bool Running { get; private set; }
-
-        public void Start()
+        public void Start(string ip)
         {
             _bot.Load();
             _timer = new Timer(Tick, null, TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
@@ -27,22 +24,36 @@ namespace bot
             sfs = new SmartFox();
             sfs.ThreadSafeMode = false;
             sfs.AddEventListener(SFSEvent.CONNECTION, OnConnection);
+            sfs.AddEventListener(SFSEvent.LOGIN, onLoginSuccess);
+            sfs.AddEventListener(SFSEvent.LOGIN_ERROR, OnLoginError);
 
             // Set connection parameters
             ConfigData cfg = new ConfigData();
-            cfg.Host = "172.16.15.54";
+            cfg.Host = ip;
             cfg.Port = 9933;
             cfg.Zone = "gmm";
             cfg.Debug = false;
-
-            sfs.Connect(cfg);
-
-            Running = true;
+            cfg.BlueBox.IsActive = true;
+            
+            sfs.Connect(cfg);            
         }
 
-        private void Tick( Object state )
+        private void onLoginSuccess(BaseEvent evt)
+        {
+            //var username = evt.Params["user"] as User;
+            Console.WriteLine("LoginSuccess");
+        }
+
+        private void OnLoginError(BaseEvent evt)
+        {
+            Console.WriteLine("Login error");
+        }
+
+        private void Tick(Object state)
         {
             Console.WriteLine("Tick");
+            if (sfs != null) sfs.ProcessEvents();
+
             _timer.Change(TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
         }
 
@@ -50,14 +61,13 @@ namespace bot
         {
             Console.WriteLine("Smartfox connection state: " + (bool)evt.Params["success"]);
             SFSObject parameters = new SFSObject();
-            parameters.PutUtfString("BATTLE_MODE", "BATTLE_MODE");
+            parameters.PutUtfString("BATTLE_MODE", "NORMAL");
             parameters.PutUtfString("ID_TOKEN", "bot");
-            sfs.Send(new LoginRequest("username", "", "gmm", parameters));
+            sfs.Send(new LoginRequest("tung.tranhuy", "", "gmm", parameters));
         }
 
         public void Stop()
         {
-            Running = false;
             _bot?.Unload();
         }
     }
