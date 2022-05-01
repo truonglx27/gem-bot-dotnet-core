@@ -8,17 +8,37 @@ using Timer = System.Threading.Timer;
 
 namespace bot
 {
-    class Game
+    public class Game
     {
         private SmartFox sfs;
+        private const string IP = "172.16.100.112";        
         private const string username = "trung.hoangdinh";
 
         private Bot _bot = new Bot();
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
         private Timer _timer = null;
         private bool isJoinGameRoom = false;
+        private bool isLogin = false;
 
         private Room room;
+
+        public void Start()
+        {
+            Console.WriteLine("Connecting to Game-Server at " + IP);
+
+            _bot.Load();
+            _timer = new Timer(Tick, null, TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
+
+            // Connect to SFS
+            ConfigData cfg = new ConfigData();
+            cfg.Host = IP;
+            cfg.Port = 9933;
+            cfg.Zone = "gmm";
+            cfg.Debug = false;
+            cfg.BlueBox.IsActive = true;
+            
+            sfs.Connect(cfg);            
+        }
 
         public Game(){
             sfs = new SmartFox();
@@ -33,15 +53,11 @@ namespace bot
             sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
         }
 
-        private void FindRoomAndJoin(){
-            List<Room> rooms = sfs.RoomList;
-            List<Room> joinedRooms = sfs.JoinedRooms;
-
-            var room = rooms.First(room1 => { return room1.IsGame && room1.UserCount == 1;} );
-            if (room != null) {
-                sfs.Send(new JoinRoomRequest(room));
-                isJoinGameRoom = true;
-            }
+        private void FindGame(){
+            var data = new SFSObject();
+            data.PutUtfString("type", "");
+            data.PutUtfString("adventureId", "");
+            sfs.Send(new ExtensionRequest(ConstantCommand.LOBBY_FIND_GAME, data));
         }
 
         private void OnRoomJoin(BaseEvent evt)
@@ -49,8 +65,10 @@ namespace bot
             Console.WriteLine("Joined room " + this.sfs.LastJoinedRoom.Name);
             this.room = (Room) evt.Params["room"];
             if (room.IsGame) {
+                isJoinGameRoom = true;
                 return;
             }
+
 
             //taskScheduler.schedule(new FindRoomGame(), new Date(System.currentTimeMillis() + delayFindGame));
         }
@@ -89,28 +107,12 @@ namespace bot
             }
         }
 
-        public void Start(string ip)
-        {
-            Console.WriteLine("Connecting to Game-Server at " + ip);
-
-            _bot.Load();
-            _timer = new Timer(Tick, null, TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
-
-            // Connect to SFS
-            ConfigData cfg = new ConfigData();
-            cfg.Host = ip;
-            cfg.Port = 9933;
-            cfg.Zone = "gmm";
-            cfg.Debug = false;
-            cfg.BlueBox.IsActive = true;
-            
-            sfs.Connect(cfg);            
-        }
-
         private void onLoginSuccess(BaseEvent evt)
         {
             var user = evt.Params["user"] as User;
             Console.WriteLine("Login Success! You are: " + user?.Name);
+
+            isLogin = true;
         }
 
         private void OnLoginError(BaseEvent evt)
@@ -120,12 +122,15 @@ namespace bot
 
         private void Tick(Object state)
         {
-            if (sfs != null) sfs.ProcessEvents();
+            //if (sfs != null) sfs.ProcessEvents();
 
             _timer.Change(TIME_INTERVAL_IN_MILLISECONDS, Timeout.Infinite);
 
-            if (!isJoinGameRoom){
-                FindRoomAndJoin();
+            //Console.WriteLine("Tick " + sfs.IsConnected);
+
+            // If bot is at Lobby then FindGame
+            if (isLogin && !isJoinGameRoom){
+                FindGame();
             }
         }
 
