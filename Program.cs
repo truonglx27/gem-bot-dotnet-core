@@ -6,8 +6,8 @@
         {
             Console.WriteLine("=== PRESS `q` AT ANY TIME TO STOP THIS ===");
             
-            var game = new Game();
-            game.Start();
+            var bot = new GemBot();
+            bot.Start();
 
             while (true){
                 var input = Console.ReadKey();
