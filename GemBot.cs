@@ -44,6 +44,7 @@ namespace bot
             currentPlayerId = gameSession.GetInt("currentPlayerId");
             log("StartGame ");
             
+            SendFinishTurn(true);
             //taskScheduler.schedule(new FinishTurn(true), new Date(System.currentTimeMillis() + delaySwapGem));
         }
 
@@ -59,7 +60,24 @@ namespace bot
 
         protected override void StartTurn(ISFSObject paramz)
         {
+            currentPlayerId = paramz.GetInt("currentPlayerId");
+            if (!isBotTurn()) {
+                return;
+            }
 
+            Hero heroFullMana = botPlayer.anyHeroFullMana();
+            if (heroFullMana != null) {
+                //taskScheduler.schedule(new SendReQuestSkill(heroFullMana.get()), new Date(System.currentTimeMillis() + delaySwapGem));
+                SendCastSkill(heroFullMana);
+                return;
+            }
+
+            //taskScheduler.schedule(new SendRequestSwapGem(), new Date(System.currentTimeMillis() + delaySwapGem));
+            SendSwapGem();
+        }
+
+        protected bool isBotTurn() {
+            return botPlayer.playerId == currentPlayerId;
         }
     }
 }

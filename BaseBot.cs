@@ -186,5 +186,56 @@ namespace bot
         protected abstract void HandleGems(ISFSObject paramz);
 
         protected abstract void StartTurn(ISFSObject paramz);
+
+        public void SendFinishTurn(bool isFirstTurn) {
+            SFSObject data = new SFSObject();
+            data.PutBool("isFirstTurn", isFirstTurn);
+            log("sendExtensionRequest()|room:" + room.Name + "|extCmd:" + ConstantCommand.FINISH_TURN + " first turn " + isFirstTurn);
+            sendExtensionRequest(ConstantCommand.FINISH_TURN, data);
+        }
+
+        public void SendCastSkill(Hero heroCastSkill){
+            var data = new SFSObject();
+
+            data.PutUtfString("casterId", heroCastSkill.id.ToString());
+            if (heroCastSkill.isHeroSelfSkill()) {
+                data.PutUtfString("targetId", botPlayer.firstHeroAlive().id.ToString());
+            } else {
+                data.PutUtfString("targetId", enemyPlayer.firstHeroAlive().id.ToString());
+            }
+
+            data.PutUtfString("selectedGem", selectGem().ToString());
+            data.PutUtfString("gemIndex", new Random().Next(64).ToString());
+            log("sendExtensionRequest()|room:" + room.Name + "|extCmd:" + ConstantCommand.USE_SKILL + "|Hero cast skill: " + heroCastSkill.name);
+            sendExtensionRequest(ConstantCommand.USE_SKILL, data);
+        }
+
+        public void SendSwapGem() {
+            var data = new SFSObject();
+
+            Pair<int> indexSwap = grid.recommendSwapGem();
+            data.PutInt("index1", indexSwap.param1);
+            data.PutInt("index2", indexSwap.param2);
+            log("sendExtensionRequest()|room:" + room.Name + "|extCmd:" + ConstantCommand.SWAP_GEM + "|index1: " + indexSwap.param1 + " index2: " + indexSwap.param2);
+            sendExtensionRequest(ConstantCommand.SWAP_GEM, data);
+        }
+
+        public void sendExtensionRequest(String extCmd, ISFSObject paramz) {
+            this.sfs.Send(new ExtensionRequest(extCmd, paramz, room));
+        }
+
+        protected GemType selectGem() {
+            var recommendGemType = botPlayer.getRecommendGemType();
+
+            foreach(var gt in recommendGemType){
+                if (grid.gemTypes.Contains(gt)){
+                    return gt;
+                }
+            }
+
+            return GemType.YELLOW;
+
+            //return botPlayer.getRecommendGemType().stream().filter(gemType -> grid.getGemTypes().contains(gemType)).findFirst().orElseGet(null);
+        }
     }
 }
