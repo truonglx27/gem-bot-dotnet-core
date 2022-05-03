@@ -211,9 +211,9 @@ namespace bot
         }
 
         public void SendSwapGem() {
-            var data = new SFSObject();
-
             Pair<int> indexSwap = grid.recommendSwapGem();
+
+            var data = new SFSObject();
             data.PutInt("index1", indexSwap.param1);
             data.PutInt("index2", indexSwap.param2);
             log("sendExtensionRequest()|room:" + room.Name + "|extCmd:" + ConstantCommand.SWAP_GEM + "|index1: " + indexSwap.param1 + " index2: " + indexSwap.param2);

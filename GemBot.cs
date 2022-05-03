@@ -14,11 +14,6 @@ namespace bot
             Console.WriteLine("Bot.Update()");
         }
 
-        internal void Unload()
-        {
-            Console.WriteLine("Bot.Unload()");
-        }
-
         protected override void StartGame(ISFSObject gameSession, Room room){         
             // Assign Bot player & enemy player
             AssignPlayers(room);
@@ -50,12 +45,47 @@ namespace bot
 
         protected override void SwapGem(ISFSObject paramz)
         {
+            bool isValidSwap = paramz.GetBool("validSwap");
+            if (!isValidSwap) {
+                return;
+            }
 
+            HandleGems(paramz);
         }
 
         protected override void HandleGems(ISFSObject paramz)
         {
+            ISFSObject gameSession = paramz.GetSFSObject("gameSession");
+            currentPlayerId = gameSession.GetInt("currentPlayerId");
+            //get last snapshot
+            ISFSArray snapshotSfsArray = paramz.GetSFSArray("snapshots");
+            ISFSObject lastSnapshot = snapshotSfsArray.GetSFSObject(snapshotSfsArray.Size() - 1);
+            bool needRenewBoard = paramz.ContainsKey("renewBoard");
+            // update information of hero
+            HandleHeroes(lastSnapshot);
+            if (needRenewBoard) {
+                grid.updateGems(paramz.GetSFSArray("renewBoard"));
+                //taskScheduler.schedule(new FinishTurn(false), new Date(System.currentTimeMillis() + delaySwapGem));
+                SendFinishTurn(false);
+                return;
+            }
+            // update gem
+            grid.gemTypes = botPlayer.getRecommendGemType();
+            grid.updateGems(lastSnapshot.GetSFSArray("gems"));
+            //taskScheduler.schedule(new FinishTurn(false), new Date(System.currentTimeMillis() + delaySwapGem));
+            SendFinishTurn(false);
+        }
 
+        private void HandleHeroes(ISFSObject paramz) {
+            ISFSArray heroesBotPlayer = paramz.GetSFSArray(botPlayer.displayName);
+            for (int i = 0; i < botPlayer.heroes.Count; i++) {
+                botPlayer.heroes[i].updateHero(heroesBotPlayer.GetSFSObject(i));
+            }
+
+            ISFSArray heroesEnemyPlayer = paramz.GetSFSArray(enemyPlayer.displayName);
+            for (int i = 0; i < enemyPlayer.heroes.Count; i++) {
+                enemyPlayer.heroes[i].updateHero(heroesEnemyPlayer.GetSFSObject(i));
+            }
         }
 
         protected override void StartTurn(ISFSObject paramz)

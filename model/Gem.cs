@@ -3,10 +3,10 @@ namespace bot
     public class Gem {
     private const int HEIGHT = 8;
     private const int WIDTH = 8;
-    private int index;
-    private int x;
-    private int y;
-    private GemType type;
+    public int index;
+    public int x;
+    public int y;
+    public GemType type;
 
     public Gem(int index, GemType type) {
         this.index = index;

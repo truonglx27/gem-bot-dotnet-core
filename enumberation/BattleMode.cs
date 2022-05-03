@@ -22,6 +22,9 @@ namespace bot {
         SEA_SPIRIT = 5,
         FIRE_SPIRIT = 6,
         CERBERUS = 7,
-        DISPATER = 8
+        DISPATER = 8,
+        ELIZAH = 9,
+        TALOS = 10,
+        SKELETON = 11,
     }
 }

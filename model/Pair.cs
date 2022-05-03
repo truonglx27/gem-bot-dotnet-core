@@ -1,8 +1,8 @@
 
 namespace bot{
     public class Pair<T> {
-        private T param1;
-        private T param2;
+        public T param1;
+        public T param2;
 
         public Pair(T p1, T p2){
             this.param1 = p1;

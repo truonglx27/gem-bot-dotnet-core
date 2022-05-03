@@ -4,10 +4,10 @@ using System.Collections;
 namespace bot
 {
     public class Hero {
-        private int playerId;
-        private HeroIdEnum id;
-        private String name;
-        private ArrayList gemTypes = new ArrayList();
+        public int playerId;
+        public HeroIdEnum id;
+        public String name;
+        public ArrayList gemTypes = new ArrayList();
         private int maxHp; // Hp
         private int maxMana; // Mp
         private int attack;

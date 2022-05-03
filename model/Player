@@ -1,7 +1,0 @@
-
-namespace bot.model{
-    public class Pair<T> {
-        private T param1;
-        private T param2;
-    }
-}
