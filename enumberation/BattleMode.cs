@@ -4,6 +4,7 @@ namespace bot {
     }
 
     public enum GemType {
+        NONE = -1,
         SWORD = 0,
         GREEN = 1,
         YELLOW = 2,

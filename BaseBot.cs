@@ -12,7 +12,8 @@ namespace bot
     public abstract class BaseBot
     {
         private SmartFox sfs;
-        private const string IP = "172.16.100.112";        
+        //private const string IP = "172.16.100.112";
+        private const string IP = "172.16.15.54";
         private const string username = "trung.hoangdinh";
 
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
@@ -108,7 +109,10 @@ namespace bot
                     HandleGems(evtParam);
                     break;
                 case ConstantCommand.PLAYER_JOINED_GAME:
-                    this.sfs.Send(new ExtensionRequest(ConstantCommand.I_AM_READY, new SFSObject(), room));                    
+                    this.sfs.Send(new ExtensionRequest(ConstantCommand.I_AM_READY, new SFSObject(), room));
+                    break;
+                case "SEND_ALERT":
+                    
                     break;
             }
         }
@@ -206,6 +210,7 @@ namespace bot
 
             data.PutUtfString("selectedGem", selectGem().ToString());
             data.PutUtfString("gemIndex", new Random().Next(64).ToString());
+            data.PutBool("isTargetAllyOrNot", false);
             log("sendExtensionRequest()|room:" + room.Name + "|extCmd:" + ConstantCommand.USE_SKILL + "|Hero cast skill: " + heroCastSkill.name);
             sendExtensionRequest(ConstantCommand.USE_SKILL, data);
         }
@@ -227,14 +232,7 @@ namespace bot
         protected GemType selectGem() {
             var recommendGemType = botPlayer.getRecommendGemType();
 
-            foreach(var gt in recommendGemType){
-                if (grid.gemTypes.Contains(gt)){
-                    return gt;
-                }
-            }
-
-            return GemType.YELLOW;
-
+            return recommendGemType.Where(gemType => grid.gemTypes.Contains(gemType)).FirstOrDefault();
             //return botPlayer.getRecommendGemType().stream().filter(gemType -> grid.getGemTypes().contains(gemType)).findFirst().orElseGet(null);
         }
     }

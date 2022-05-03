@@ -33,21 +33,21 @@ namespace bot {
                 return new Pair<int>(-1, -1);
             }
 
-            GemSwapInfo matchGemSizeThanFour = listMatchGem.Where(gemMatch => gemMatch.sizeMatch > 4).First();
+            GemSwapInfo matchGemSizeThanFour = listMatchGem.Where(gemMatch => gemMatch.sizeMatch > 4).FirstOrDefault();
             if (matchGemSizeThanFour != null) {
                 return matchGemSizeThanFour.getIndexSwapGem();
             }
-            GemSwapInfo matchGemSizeThanThree = listMatchGem.Where(gemMatch => gemMatch.sizeMatch > 3).First();
+            GemSwapInfo matchGemSizeThanThree = listMatchGem.Where(gemMatch => gemMatch.sizeMatch > 3).FirstOrDefault();
             if (matchGemSizeThanThree != null) {
                 return matchGemSizeThanThree.getIndexSwapGem();
             }
-            GemSwapInfo matchGemSword = listMatchGem.Where(gemMatch => gemMatch.type == GemType.SWORD).First();
+            GemSwapInfo matchGemSword = listMatchGem.Where(gemMatch => gemMatch.type == GemType.SWORD).FirstOrDefault();
             if (matchGemSword != null) {
                 return matchGemSword.getIndexSwapGem();
             }
 
             foreach (GemType type in myHeroGemType) {
-                GemSwapInfo matchGem = listMatchGem.Where(gemMatch => gemMatch.type == type).First();
+                GemSwapInfo matchGem = listMatchGem.Where(gemMatch => gemMatch.type == type).FirstOrDefault();
                         //listMatchGem.stream().filter(gemMatch -> gemMatch.getType() == type).findFirst();
                 if (matchGem != null) {
                     return matchGem.getIndexSwapGem();
@@ -59,7 +59,8 @@ namespace bot {
         private List<GemSwapInfo> suggestMatch() {
             var listMatchGem = new List<GemSwapInfo>();
 
-            foreach (Gem currentGem in gems) {
+            var tempGems = new List<Gem>(gems);
+            foreach (Gem currentGem in tempGems) {
                 Gem swapGem = null;
                 // If x > 0 => swap left & check
                 if (currentGem.x > 0) {
@@ -86,10 +87,10 @@ namespace bot {
         }
 
         private void checkMatchSwapGem(List<GemSwapInfo> listMatchGem, Gem currentGem, Gem swapGem) {
-            swap(currentGem, swapGem, gems);
+            swap(currentGem, swapGem);
             HashSet<Gem> matchGems = matchesAt(currentGem.x, currentGem.y);
 
-            swap(currentGem, swapGem, gems);
+            swap(currentGem, swapGem);
             if (matchGems.Count > 0) {
                 listMatchGem.Add(new GemSwapInfo(currentGem.index, swapGem.index, matchGems.Count, currentGem.type));
             }
@@ -99,7 +100,7 @@ namespace bot {
             return x + y * 8;
         }
 
-        private void swap(Gem a, Gem b, List<Gem> gems) {
+        private void swap(Gem a, Gem b) {
             int tempIndex = a.index;
             int tempX = a.x;
             int tempY = a.y;
