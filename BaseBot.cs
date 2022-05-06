@@ -13,12 +13,15 @@ namespace bot
     {
         private SmartFox sfs;
         //private const string IP = "172.16.100.112";
-        private const string IP = "172.16.15.54";
+        private const string IP = "localhost";
         private const string username = "trung.hoangdinh";
 
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
         private const int ENEMY_PLAYER_ID = 0;
         private const int BOT_PLAYER_ID = 2;
+
+        protected int delaySwapGem = 2000;
+        protected int delayFindGame = 5000;
         private Timer _timer = null;
         private bool isJoinGameRoom = false;
         private bool isLogin = false;
@@ -150,6 +153,7 @@ namespace bot
             SFSObject parameters = new SFSObject();
             parameters.PutUtfString("BATTLE_MODE", "NORMAL");
             parameters.PutUtfString("ID_TOKEN", "bot");
+            parameters.PutUtfString("NICK_NAME", username);
             sfs.Send(new LoginRequest(username, "", "gmm", parameters));
         }
 
@@ -234,6 +238,11 @@ namespace bot
 
             return recommendGemType.Where(gemType => grid.gemTypes.Contains(gemType)).FirstOrDefault();
             //return botPlayer.getRecommendGemType().stream().filter(gemType -> grid.getGemTypes().contains(gemType)).findFirst().orElseGet(null);
+        }
+
+        protected void TaskSchedule(int milliseconds, Action<Task> action)
+        {
+            System.Threading.Tasks.Task.Delay(milliseconds).ContinueWith(action);
         }
     }
 }

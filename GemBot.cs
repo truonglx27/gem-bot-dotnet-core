@@ -14,7 +14,8 @@ namespace bot
             Console.WriteLine("Bot.Update()");
         }
 
-        protected override void StartGame(ISFSObject gameSession, Room room){         
+        protected override void StartGame(ISFSObject gameSession, Room room)
+        {
             // Assign Bot player & enemy player
             AssignPlayers(room);
 
@@ -25,12 +26,14 @@ namespace bot
             ISFSArray botPlayerHero = objBotPlayer.GetSFSArray("heroes");
             ISFSArray enemyPlayerHero = objEnemyPlayer.GetSFSArray("heroes");
 
-            for (int i = 0; i < botPlayerHero.Size(); i++) {
+            for (int i = 0; i < botPlayerHero.Size(); i++)
+            {
                 var hero = new Hero(botPlayerHero.GetSFSObject(i));
                 botPlayer.heroes.Add(hero);
             }
 
-            for (int i = 0; i < enemyPlayerHero.Size(); i++) {
+            for (int i = 0; i < enemyPlayerHero.Size(); i++)
+            {
                 enemyPlayer.heroes.Add(new Hero(enemyPlayerHero.GetSFSObject(i)));
             }
 
@@ -38,15 +41,17 @@ namespace bot
             grid = new Grid(gameSession.GetSFSArray("gems"), botPlayer.getRecommendGemType());
             currentPlayerId = gameSession.GetInt("currentPlayerId");
             log("StartGame ");
-            
-            SendFinishTurn(true);
+
+            // SendFinishTurn(true);
             //taskScheduler.schedule(new FinishTurn(true), new Date(System.currentTimeMillis() + delaySwapGem));
+            TaskSchedule(delaySwapGem, _ => SendFinishTurn(true));
         }
 
         protected override void SwapGem(ISFSObject paramz)
         {
             bool isValidSwap = paramz.GetBool("validSwap");
-            if (!isValidSwap) {
+            if (!isValidSwap)
+            {
                 return;
             }
 
@@ -63,27 +68,29 @@ namespace bot
             bool needRenewBoard = paramz.ContainsKey("renewBoard");
             // update information of hero
             HandleHeroes(lastSnapshot);
-            if (needRenewBoard) {
+            if (needRenewBoard)
+            {
                 grid.updateGems(paramz.GetSFSArray("renewBoard"));
-                //taskScheduler.schedule(new FinishTurn(false), new Date(System.currentTimeMillis() + delaySwapGem));
-                SendFinishTurn(false);
+                TaskSchedule(delaySwapGem, _ => SendFinishTurn(false));
                 return;
             }
             // update gem
             grid.gemTypes = botPlayer.getRecommendGemType();
             grid.updateGems(lastSnapshot.GetSFSArray("gems"));
-            //taskScheduler.schedule(new FinishTurn(false), new Date(System.currentTimeMillis() + delaySwapGem));
-            SendFinishTurn(false);
+            TaskSchedule(delaySwapGem, _ => SendFinishTurn(false));
         }
 
-        private void HandleHeroes(ISFSObject paramz) {
+        private void HandleHeroes(ISFSObject paramz)
+        {
             ISFSArray heroesBotPlayer = paramz.GetSFSArray(botPlayer.displayName);
-            for (int i = 0; i < botPlayer.heroes.Count; i++) {
+            for (int i = 0; i < botPlayer.heroes.Count; i++)
+            {
                 botPlayer.heroes[i].updateHero(heroesBotPlayer.GetSFSObject(i));
             }
 
             ISFSArray heroesEnemyPlayer = paramz.GetSFSArray(enemyPlayer.displayName);
-            for (int i = 0; i < enemyPlayer.heroes.Count; i++) {
+            for (int i = 0; i < enemyPlayer.heroes.Count; i++)
+            {
                 enemyPlayer.heroes[i].updateHero(heroesEnemyPlayer.GetSFSObject(i));
             }
         }
@@ -91,22 +98,24 @@ namespace bot
         protected override void StartTurn(ISFSObject paramz)
         {
             currentPlayerId = paramz.GetInt("currentPlayerId");
-            if (!isBotTurn()) {
+            if (!isBotTurn())
+            {
                 return;
             }
 
             Hero heroFullMana = botPlayer.anyHeroFullMana();
-            if (heroFullMana != null) {
-                //taskScheduler.schedule(new SendReQuestSkill(heroFullMana.get()), new Date(System.currentTimeMillis() + delaySwapGem));
-                SendCastSkill(heroFullMana);
+            if (heroFullMana != null)
+            {
+                TaskSchedule(delaySwapGem, _ => SendCastSkill(heroFullMana));
                 return;
             }
+            TaskSchedule(delaySwapGem, _ => SendSwapGem());
 
-            //taskScheduler.schedule(new SendRequestSwapGem(), new Date(System.currentTimeMillis() + delaySwapGem));
-            SendSwapGem();
+
         }
 
-        protected bool isBotTurn() {
+        protected bool isBotTurn()
+        {
             return botPlayer.playerId == currentPlayerId;
         }
     }
