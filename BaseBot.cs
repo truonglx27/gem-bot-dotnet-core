@@ -12,9 +12,11 @@ namespace bot
     public abstract class BaseBot
     {
         private SmartFox sfs;
-        //private const string IP = "172.16.100.112";
-        private const string IP = "localhost";
-        private const string username = "trung.hoangdinh";
+        private const string IP = "172.16.100.112";
+        // private const string IP = "10.10.10.18";
+        private const string username = "truong.lexuan";
+
+        private const string token = "bot";
 
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
         private const int ENEMY_PLAYER_ID = 0;
@@ -45,11 +47,12 @@ namespace bot
             cfg.Zone = "gmm";
             cfg.Debug = false;
             cfg.BlueBox.IsActive = true;
-            
-            sfs.Connect(cfg);            
+
+            sfs.Connect(cfg);
         }
 
-        public BaseBot(){
+        public BaseBot()
+        {
             sfs = new SmartFox();
             sfs.ThreadSafeMode = false;
             sfs.AddEventListener(SFSEvent.CONNECTION, OnConnection);
@@ -62,7 +65,8 @@ namespace bot
             sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
         }
 
-        private void FindGame(){
+        private void FindGame()
+        {
             var data = new SFSObject();
             data.PutUtfString("type", "");
             data.PutUtfString("adventureId", "");
@@ -72,8 +76,9 @@ namespace bot
         private void OnRoomJoin(BaseEvent evt)
         {
             Console.WriteLine("Joined room " + this.sfs.LastJoinedRoom.Name);
-            this.room = (Room) evt.Params["room"];
-            if (room.IsGame) {
+            this.room = (Room)evt.Params["room"];
+            if (room.IsGame)
+            {
                 isJoinGameRoom = true;
                 return;
             }
@@ -88,15 +93,16 @@ namespace bot
         }
 
         private void OnExtensionResponse(BaseEvent evt)
-        {            
+        {
             var evtParam = (ISFSObject)evt.Params["params"];
             var cmd = (string)evt.Params["cmd"];
             Console.WriteLine("OnExtensionResponse " + cmd);
 
-            switch (cmd){
+            switch (cmd)
+            {
                 case ConstantCommand.START_GAME:
                     ISFSObject gameSession = evtParam.GetSFSObject("gameSession");
-                    
+
                     StartGame(gameSession, room);
                     break;
                 case ConstantCommand.END_GAME:
@@ -115,7 +121,7 @@ namespace bot
                     this.sfs.Send(new ExtensionRequest(ConstantCommand.I_AM_READY, new SFSObject(), room));
                     break;
                 case "SEND_ALERT":
-                    
+
                     break;
             }
         }
@@ -142,7 +148,8 @@ namespace bot
             //Console.WriteLine("Tick " + sfs.IsConnected);
 
             // If bot is at Lobby then FindGame
-            if (isLogin && !isJoinGameRoom){
+            if (isLogin && !isJoinGameRoom)
+            {
                 FindGame();
             }
         }
@@ -152,7 +159,7 @@ namespace bot
             Console.WriteLine("Smartfox connection state: " + (bool)evt.Params["success"]);
             SFSObject parameters = new SFSObject();
             parameters.PutUtfString("BATTLE_MODE", "NORMAL");
-            parameters.PutUtfString("ID_TOKEN", "bot");
+            parameters.PutUtfString("ID_TOKEN", token);
             parameters.PutUtfString("NICK_NAME", username);
             sfs.Send(new LoginRequest(username, "", "gmm", parameters));
         }
@@ -162,28 +169,35 @@ namespace bot
             Console.WriteLine("Smartfox OnConnectionLost");
         }
 
-        private void endGame() {
+        private void endGame()
+        {
             isJoinGameRoom = false;
         }
 
-        protected void AssignPlayers(Room room) {
+        protected void AssignPlayers(Room room)
+        {
             User user1 = room.PlayerList[0];
             log("id user1: " + user1.PlayerId);
 
-            if (user1.IsItMe) {
+            if (user1.IsItMe)
+            {
                 botPlayer = new Player(user1.PlayerId, "player1");
                 enemyPlayer = new Player(ENEMY_PLAYER_ID, "player2");
-            } else {
+            }
+            else
+            {
                 botPlayer = new Player(BOT_PLAYER_ID, "player2");
                 enemyPlayer = new Player(ENEMY_PLAYER_ID, "player1");
             }
         }
 
-        protected void logStatus(String status, String logMsg) {
+        protected void logStatus(String status, String logMsg)
+        {
             Console.WriteLine(status + "|" + logMsg + "\n");
         }
 
-        protected void log(String msg) {
+        protected void log(String msg)
+        {
             Console.WriteLine(username + "|" + msg);
         }
 
@@ -195,20 +209,25 @@ namespace bot
 
         protected abstract void StartTurn(ISFSObject paramz);
 
-        public void SendFinishTurn(bool isFirstTurn) {
+        public void SendFinishTurn(bool isFirstTurn)
+        {
             SFSObject data = new SFSObject();
             data.PutBool("isFirstTurn", isFirstTurn);
             log("sendExtensionRequest()|room:" + room.Name + "|extCmd:" + ConstantCommand.FINISH_TURN + " first turn " + isFirstTurn);
             sendExtensionRequest(ConstantCommand.FINISH_TURN, data);
         }
 
-        public void SendCastSkill(Hero heroCastSkill){
+        public void SendCastSkill(Hero heroCastSkill)
+        {
             var data = new SFSObject();
 
             data.PutUtfString("casterId", heroCastSkill.id.ToString());
-            if (heroCastSkill.isHeroSelfSkill()) {
+            if (heroCastSkill.isHeroSelfSkill())
+            {
                 data.PutUtfString("targetId", botPlayer.firstHeroAlive().id.ToString());
-            } else {
+            }
+            else
+            {
                 data.PutUtfString("targetId", enemyPlayer.firstHeroAlive().id.ToString());
             }
 
@@ -219,7 +238,8 @@ namespace bot
             sendExtensionRequest(ConstantCommand.USE_SKILL, data);
         }
 
-        public void SendSwapGem() {
+        public void SendSwapGem()
+        {
             Pair<int> indexSwap = grid.recommendSwapGem();
 
             var data = new SFSObject();
@@ -229,11 +249,13 @@ namespace bot
             sendExtensionRequest(ConstantCommand.SWAP_GEM, data);
         }
 
-        public void sendExtensionRequest(String extCmd, ISFSObject paramz) {
+        public void sendExtensionRequest(String extCmd, ISFSObject paramz)
+        {
             this.sfs.Send(new ExtensionRequest(extCmd, paramz, room));
         }
 
-        protected GemType selectGem() {
+        protected GemType selectGem()
+        {
             var recommendGemType = botPlayer.getRecommendGemType();
 
             return recommendGemType.Where(gemType => grid.gemTypes.Contains(gemType)).FirstOrDefault();
