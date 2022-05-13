@@ -14,7 +14,7 @@ namespace bot
         private SmartFox sfs;
         private const string IP = "172.16.100.112";
         // private const string IP = "10.10.10.18";
-        private const string username = "truong.lexuan";
+        private const string username = "trung.hoangdinh";
 
         private const string token = "bot";
 
@@ -22,7 +22,7 @@ namespace bot
         private const int ENEMY_PLAYER_ID = 0;
         private const int BOT_PLAYER_ID = 2;
 
-        protected int delaySwapGem = 2000;
+        protected int delaySwapGem = 3500;
         protected int delayFindGame = 5000;
         private Timer _timer = null;
         private bool isJoinGameRoom = false;

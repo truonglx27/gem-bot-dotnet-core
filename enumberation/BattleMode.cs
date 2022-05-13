@@ -1,9 +1,12 @@
-namespace bot {
-    public enum BattleMode {
+namespace bot
+{
+    public enum BattleMode
+    {
         NORMAL
     }
 
-    public enum GemType {
+    public enum GemType
+    {
         NONE = -1,
         SWORD = 0,
         GREEN = 1,
@@ -14,7 +17,8 @@ namespace bot {
         BROWN = 6
     }
 
-    public enum HeroIdEnum {
+    public enum HeroIdEnum
+    {
         THUNDER_GOD = 0,
         MONK = 1,
         AIR_SPIRIT = 2,
@@ -26,6 +30,15 @@ namespace bot {
         DISPATER = 8,
         ELIZAH = 9,
         TALOS = 10,
-        SKELETON = 11,
+        MONKEY = 11,
+        GUTS = 12,
+
+        SKELETON = 100,
+        SPIDER = 101,
+        WOLF = 102,
+        BAT = 103,
+        BERSERKER = 104,
+        SNAKE = 105,
+        GIANT_SNAKE = 106
     }
 }
