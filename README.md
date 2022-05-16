@@ -13,7 +13,7 @@ git clone https://github.com/<githubusername>/gem-bot-dotnet-core
 https://dotnet.microsoft.com/en-us/download
 
 
-## create your branch
+## Create your branch
 
 ## Implement your bot
 
