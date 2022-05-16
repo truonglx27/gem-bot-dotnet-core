@@ -25,7 +25,7 @@ Implement your logic, please see `BaseBot.cs` , `GemBot.cs`
 dotnet run
 ```
 
-inspect your bot
+## Inspect your bot
 
 http://172.16.100.112:5555/
 
