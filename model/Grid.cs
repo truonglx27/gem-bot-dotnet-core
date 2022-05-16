@@ -9,17 +9,17 @@ namespace bot {
         public HashSet<GemType> gemTypes = new HashSet<GemType>();
         private HashSet<GemType> myHeroGemType;
 
-        public Grid(ISFSArray gemsCode, HashSet<GemType> gemTypes)
+        public Grid(ISFSArray gemsCode,ISFSArray gemModifiers,  HashSet<GemType> gemTypes)
         {
-            updateGems(gemsCode);
+            updateGems(gemsCode, gemModifiers);
             this.myHeroGemType = gemTypes;
         }
 
-        public void updateGems(ISFSArray gemsCode) {
+        public void updateGems(ISFSArray gemsCode, ISFSArray gemModifiers) {
             gems.Clear();
             gemTypes.Clear();
             for (int i = 0; i < gemsCode.Size(); i++) {
-                Gem gem = new Gem(i, (GemType)gemsCode.GetByte(i));
+                Gem gem = new Gem(i, (GemType)gemsCode.GetByte(i) , gemModifiers != null ? (GemModifier)gemModifiers.GetByte(i) : GemModifier.NONE);
                 gems.Add(gem);
                 gemTypes.Add(gem.type);
             }

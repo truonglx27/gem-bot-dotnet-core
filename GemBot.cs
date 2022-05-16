@@ -38,7 +38,7 @@ namespace bot
             }
 
             // Gems
-            grid = new Grid(gameSession.GetSFSArray("gems"), botPlayer.getRecommendGemType());
+            grid = new Grid(gameSession.GetSFSArray("gems"), null, botPlayer.getRecommendGemType());
             currentPlayerId = gameSession.GetInt("currentPlayerId");
             log("StartGame ");
 
@@ -70,13 +70,20 @@ namespace bot
             HandleHeroes(lastSnapshot);
             if (needRenewBoard)
             {
-                grid.updateGems(paramz.GetSFSArray("renewBoard"));
+                grid.updateGems(paramz.GetSFSArray("renewBoard"), null);
                 TaskSchedule(delaySwapGem, _ => SendFinishTurn(false));
                 return;
             }
             // update gem
             grid.gemTypes = botPlayer.getRecommendGemType();
-            grid.updateGems(lastSnapshot.GetSFSArray("gems"));
+
+            ISFSArray gemCodes = lastSnapshot.GetSFSArray("gems");
+            ISFSArray gemModifiers = lastSnapshot.GetSFSArray("gemModifiers");
+
+            if (gemModifiers != null) log("has gemModifiers");
+
+            grid.updateGems(gemCodes, gemModifiers);
+
             TaskSchedule(delaySwapGem, _ => SendFinishTurn(false));
         }
 
