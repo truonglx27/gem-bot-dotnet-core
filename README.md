@@ -32,3 +32,7 @@ http://172.16.100.112:5555/
 ## You can follow step by step at this link: 
 https://docs.google.com/spreadsheets/d/1qQKvIKL5nIB7BN3R5UOMKxZuwQ1SNJ3Fb62mppIa5YI/edit#gid=1197533246
 
+## Hero information list
+https://docs.google.com/spreadsheets/d/1qQKvIKL5nIB7BN3R5UOMKxZuwQ1SNJ3Fb62mppIa5YI/edit#gid=177224486
+
+
