@@ -121,9 +121,15 @@ namespace bot
                     this.sfs.Send(new ExtensionRequest(ConstantCommand.I_AM_READY, new SFSObject(), room));
                     break;
                 case "SEND_ALERT":
-
+                    ShowError(evtParam);
                     break;
             }
+        }
+
+        private void ShowError(ISFSObject param)
+        {
+            String error = param.GetUtfString("message");
+            log(error);
         }
 
         private void onLoginSuccess(BaseEvent evt)
@@ -176,18 +182,44 @@ namespace bot
 
         protected void AssignPlayers(Room room)
         {
-            User user1 = room.PlayerList[0];
-            log("id user1: " + user1.PlayerId);
+
+            List<User> users = room.PlayerList;
+
+            User user1 = users[0];
+
+            log("id user1: " + user1.PlayerId + " name:" + user1.Name);
+
+            if (users.Count == 1)
+            {
+                if (user1.IsItMe)
+                {
+                    botPlayer = new Player(user1.PlayerId, "player1");
+                    enemyPlayer = new Player(ENEMY_PLAYER_ID, "player2");
+                }
+                else
+                {
+                    botPlayer = new Player(BOT_PLAYER_ID, "player2");
+                    enemyPlayer = new Player(ENEMY_PLAYER_ID, "player1");
+                }
+
+                return;
+            }
+
+            User user2 = users[1];
+
+            log("id user2: " + user2.PlayerId + " name:" + user2.Name);
+
+            log("id user1: " + user1.PlayerId + " name:" + user1.Name);
 
             if (user1.IsItMe)
             {
-                botPlayer = new Player(user1.PlayerId, "player1");
-                enemyPlayer = new Player(ENEMY_PLAYER_ID, "player2");
+                botPlayer = new Player(user1.PlayerId, "player" + user1.PlayerId);
+                enemyPlayer = new Player(user2.PlayerId, "player" + user2.PlayerId);
             }
             else
             {
-                botPlayer = new Player(BOT_PLAYER_ID, "player2");
-                enemyPlayer = new Player(ENEMY_PLAYER_ID, "player1");
+                botPlayer = new Player(user2.PlayerId, "player" + user2.PlayerId);
+                enemyPlayer = new Player(user1.PlayerId, "player" + user1.PlayerId);
             }
         }
 
