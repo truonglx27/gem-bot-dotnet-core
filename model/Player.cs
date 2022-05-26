@@ -1,5 +1,6 @@
 
-namespace bot {
+namespace bot
+{
     public class Player
     {
         public int playerId;
@@ -16,28 +17,75 @@ namespace bot {
             heroGemType = new HashSet<GemType>();
         }
 
-        public Hero anyHeroFullMana() {
-            foreach(var hero in heroes){
+        public Hero anyHeroFullMana()
+        {
+            foreach (var hero in heroes)
+            {
                 if (hero.isAlive() && hero.isFullMana()) return hero;
             }
 
             return null;
         }
 
-        public Hero firstHeroAlive() {
-            foreach(var hero in heroes){
+        public Hero firstHeroAlive()
+        {
+            foreach (var hero in heroes)
+            {
                 if (hero.isAlive()) return hero;
             }
 
             return null;
         }
 
-        public HashSet<GemType> getRecommendGemType() {
+        public Hero GetHeroSEA_SPIRIT()
+        {
+            foreach (var hero in heroes)
+            {
+                if (hero.isAlive() && hero.id == HeroIdEnum.AIR_SPIRIT) return hero;
+            }
+
+            return firstHeroAlive();
+        }
+
+        public bool IsHeroLive(HeroIdEnum id)
+        {
+            foreach (var hero in heroes)
+            {
+                if (hero.isAlive() && hero.id == id) return true;
+            }
+            return false;
+        }
+
+
+
+        public Hero AttackedByFIRE_SPIRIT()
+        {
+            foreach (var hero in heroes)
+            {
+                if (hero.isAlive() &&
+                ((hero.id == HeroIdEnum.AIR_SPIRIT) ||
+                 (hero.id == HeroIdEnum.FIRE_SPIRIT) ||
+                 (hero.id == HeroIdEnum.CERBERUS) ||
+                 (hero.id == HeroIdEnum.SEA_GOD) ||
+                 (hero.id == HeroIdEnum.MONK))
+                )
+                {
+                    return hero;
+                }
+            }
+
+            return firstHeroAlive();
+        }
+
+        public HashSet<GemType> getRecommendGemType()
+        {
             heroGemType.Clear();
-            foreach(var hero in heroes){
+            foreach (var hero in heroes)
+            {
                 if (!hero.isAlive()) continue;
-                
-                foreach(var gt in hero.gemTypes){
+
+                foreach (var gt in hero.gemTypes)
+                {
                     heroGemType.Add((GemType)gt);
                 }
             }

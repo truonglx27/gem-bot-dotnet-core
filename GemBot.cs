@@ -38,7 +38,7 @@ namespace bot
             }
 
             // Gems
-            grid = new Grid(gameSession.GetSFSArray("gems"), null, botPlayer.getRecommendGemType());
+            grid = new Grid(gameSession.GetSFSArray("gems"), null, botPlayer.getRecommendGemType(),botPlayer);
             currentPlayerId = gameSession.GetInt("currentPlayerId");
             log("StartGame ");
 

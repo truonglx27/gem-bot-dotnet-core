@@ -16,7 +16,7 @@ namespace bot
         // private const string IP = "10.10.10.18";
         private const string username = "trung.hoangdinh";
 
-        private const string token = "bot";
+        private const string token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0cnVuZy5ob2FuZ2RpbmgiLCJhdXRoIjoiUk9MRV9VU0VSIiwiTEFTVF9MT0dJTl9USU1FIjoxNjUyODU4NjI1Njg0LCJleHAiOjE2NTQ2NTg2MjV9.86EcfhzEOm25v8BztcqOZCvqsw5AH7qRFIcEDbbSioR5cR7AiF3TcTgogfMlV8mttA40R8W0JI8gaXGTn_zFcA";
 
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
         private const int ENEMY_PLAYER_ID = 0;
@@ -254,13 +254,28 @@ namespace bot
             var data = new SFSObject();
 
             data.PutUtfString("casterId", heroCastSkill.id.ToString());
+
             if (heroCastSkill.isHeroSelfSkill())
             {
-                data.PutUtfString("targetId", botPlayer.firstHeroAlive().id.ToString());
+                Hero hero = botPlayer.GetHeroSEA_SPIRIT();
+                string idHero = hero.id.ToString();
+
+                data.PutUtfString("targetId", idHero);
             }
             else
             {
-                data.PutUtfString("targetId", enemyPlayer.firstHeroAlive().id.ToString());
+                if (heroCastSkill.id == HeroIdEnum.FIRE_SPIRIT)
+                {
+                    Hero enemy = enemyPlayer.AttackedByFIRE_SPIRIT();
+                    string idHero = enemy.id.ToString();
+
+                    log("is hero FIRE_SPIRIT || target : " + idHero);
+                    data.PutUtfString("targetId", idHero);
+                }
+                else
+                {
+                    data.PutUtfString("targetId", enemyPlayer.firstHeroAlive().id.ToString());
+                }
             }
 
             data.PutUtfString("selectedGem", selectGem().ToString());
