@@ -14,9 +14,9 @@ namespace bot
         private SmartFox sfs;
         private const string IP = "172.16.100.112";
         // private const string IP = "10.10.10.18";
-        private const string username = "trung.hoangdinh";
+        private const string username = "viet.dangquoc";
 
-        private const string token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0cnVuZy5ob2FuZ2RpbmgiLCJhdXRoIjoiUk9MRV9VU0VSIiwiTEFTVF9MT0dJTl9USU1FIjoxNjUyODU4NjI1Njg0LCJleHAiOjE2NTQ2NTg2MjV9.86EcfhzEOm25v8BztcqOZCvqsw5AH7qRFIcEDbbSioR5cR7AiF3TcTgogfMlV8mttA40R8W0JI8gaXGTn_zFcA";
+        private const string token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWV0LmRhbmdxdW9jIiwiYXV0aCI6IlJPTEVfVVNFUiIsIkxBU1RfTE9HSU5fVElNRSI6MTY1MzAzMzgwMjQ0MiwiZXhwIjoxNjU0ODMzODAyfQ.XNDRCBnuUNHIGom4ICBhFxXiKbNPjDKSNa11v-OlkUMOadnCAoIbExR7CtNIpprAVo6rsMHoD4YRxSQ0JKM2Ig";
 
         private const int TIME_INTERVAL_IN_MILLISECONDS = 1000;
         private const int ENEMY_PLAYER_ID = 0;
